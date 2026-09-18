@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
 
-EMBEDDING_DIMENSIONS = 1536
+EMBEDDING_DIMENSIONS = 384
 
 
 class DocumentChunk(Base):
