@@ -9,3 +9,6 @@ alembic
 supabase
 python-jose[cryptography]
 pre-commit
+opencv-python-headless
+google-cloud-vision
+pytest
