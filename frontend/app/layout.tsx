@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
+import { RagAssistant } from "@/components/chat/RagAssistant";
+import { TopNav } from "@/components/layout/TopNav";
+import { LanguageProvider } from "@/lib/LanguageContext";
+
 export const metadata: Metadata = {
   title: "SSIP GovTech Platform",
   description:
@@ -13,7 +17,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <LanguageProvider>
+          <TopNav />
+          <main className="container py-8">{children}</main>
+          <RagAssistant />
+        </LanguageProvider>
+      </body>
     </html>
   );
 }
