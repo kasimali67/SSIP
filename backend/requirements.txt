@@ -12,3 +12,6 @@ pre-commit
 opencv-python-headless
 google-cloud-vision
 pytest
+llama-index-core
+llama-index-embeddings-fastembed
+fastembed
