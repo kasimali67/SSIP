@@ -27,3 +27,4 @@ venv/
 Thumbs.db
 .kilocode/
 .pytest_cache/
+*.tsbuildinfo
