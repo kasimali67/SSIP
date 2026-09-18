@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     supabase_key: str | None = None
     supabase_jwt_secret: str | None = None
     database_url: str | None = None
+    openrouter_api_key: str | None = None
 
 
 @lru_cache

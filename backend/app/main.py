@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.routes.ocr import router as ocr_router
+from app.routes.rag import router as rag_router
 
 settings = get_settings()
 
@@ -20,6 +21,7 @@ app.add_middleware(
 )
 
 app.include_router(ocr_router)
+app.include_router(rag_router)
 
 
 @app.exception_handler(HTTPException)
