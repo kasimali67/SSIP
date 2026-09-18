@@ -4,6 +4,7 @@ pydantic
 pydantic-settings
 sqlalchemy[asyncio]
 asyncpg
+pgvector
 alembic
 supabase
 python-jose[cryptography]
