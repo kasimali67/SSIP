@@ -11,8 +11,11 @@ from app.services.embeddings import get_embedding
 
 DEFAULT_MATCH_COUNT = 5
 MAX_COSINE_DISTANCE = 0.6
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = "deepseek/deepseek-chat"
+
+# 1. Update the URL and Model to Gemini
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+GEMINI_MODEL = "gemini-1.5-flash"
+
 NO_INFO_MESSAGE = (
     "No information is available in the indexed checklists to answer this question."
 )
@@ -21,7 +24,6 @@ SYSTEM_PROMPT = (
     "form applications. If the context does not contain the answer, state that the "
     "information is not available. Never invent details."
 )
-
 
 async def similarity_search(
     query_embedding: list[float],
@@ -44,31 +46,34 @@ async def similarity_search(
         for row in rows
     ]
 
-
-async def _call_openrouter(question: str, contexts: list[str]) -> str:
+# 2. Rename the function and update the settings check
+async def _call_gemini(question: str, contexts: list[str]) -> str:
     settings = get_settings()
-    if not settings.openrouter_api_key:
-        raise RuntimeError("OPENROUTER_API_KEY is not set.")
+    
+    # 3. Check for the Gemini API Key
+    if not getattr(settings, "gemini_api_key", None):
+        raise RuntimeError("GEMINI_API_KEY is not set in your config.")
 
     joined = "\n\n---\n\n".join(contexts)
     payload: dict[str, Any] = {
-        "model": OPENROUTER_MODEL,
+        "model": GEMINI_MODEL,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"Context:\n{joined}\n\nQuestion: {question}"},
         ],
     }
-    headers = {"Authorization": f"Bearer {settings.openrouter_api_key}"}
+    
+    # 4. Use the Gemini API Key in the Bearer token
+    headers = {"Authorization": f"Bearer {settings.gemini_api_key}"}
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(OPENROUTER_URL, headers=headers, json=payload)
+        response = await client.post(GEMINI_URL, headers=headers, json=payload)
         response.raise_for_status()
 
     choices = response.json().get("choices") or []
     if not choices:
-        raise RuntimeError("OpenRouter returned no choices")
+        raise RuntimeError("Gemini returned no choices")
     return str(choices[0]["message"]["content"]).strip()
-
 
 async def answer_question(question: str) -> dict[str, Any]:
     embedding = await run_in_threadpool(get_embedding, question)
@@ -78,7 +83,8 @@ async def answer_question(question: str) -> dict[str, Any]:
     if not relevant:
         return {"answer": NO_INFO_MESSAGE, "sources": [], "chunks_used": 0}
 
-    answer = await _call_openrouter(question, [match[0] for match in relevant])
+    # 5. Call the updated function
+    answer = await _call_gemini(question, [match[0] for match in relevant])
 
     sources: list[str] = []
     for _, source, _ in relevant:

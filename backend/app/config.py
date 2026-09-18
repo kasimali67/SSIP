@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str | None = None
     database_url: str | None = None
     openrouter_api_key: str | None = None
+    gemini_api_key: str | None = None
 
 
 @lru_cache
