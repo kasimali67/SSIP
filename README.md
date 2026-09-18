@@ -16,7 +16,6 @@ A citizen-facing multilingual OCR and RAG assistant for Indian government form a
 .
 ├── backend/     FastAPI service: async routes, Pydantic schemas, services, settings
 ├── frontend/    Next.js App Router app: UI, typed API client, Supabase client
-├── .kilocode/   Project rules for contributors and coding agents
 └── .pre-commit-config.yaml   Secret scanning and repo hygiene hooks
 ```
 
