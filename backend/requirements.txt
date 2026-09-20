@@ -15,3 +15,4 @@ pytest
 llama-index-core
 llama-index-embeddings-fastembed
 fastembed
+python-multipart==0.0.32
