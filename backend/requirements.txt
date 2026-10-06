@@ -21,3 +21,4 @@ httpx
 pytesseract
 defusedxml
 python-multipart==0.0.32
+playwright
