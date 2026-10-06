@@ -9,6 +9,7 @@ import {
   useState,
   type ChangeEvent,
   type DragEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import {
   CircleCheck,
@@ -20,7 +21,6 @@ import {
   UploadCloud,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -59,6 +59,7 @@ const MOCK_CONFIDENCES: Record<keyof OcrFields, number> = {
 };
 
 const LOW_CONFIDENCE = 0.75;
+const OTP_LENGTH = 6;
 
 function id(): string {
   return crypto.randomUUID();
@@ -148,11 +149,13 @@ function UploadPrompt({ onFile }: { onFile: (file: File) => void }) {
         }}
         onDragOver={(event) => event.preventDefault()}
         onDrop={handleDrop}
-        className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-400 bg-white p-6 text-center hover:border-[var(--civic-ink)]"
+        className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-300 bg-white p-6 text-center hover:border-indigo-500"
       >
-        <UploadCloud className="h-7 w-7 text-muted-foreground" />
-        <p className="text-sm font-medium">Drop a document here or click to upload</p>
-        <p className="text-xs text-muted-foreground">PNG, JPG or PDF</p>
+        <UploadCloud className="h-7 w-7 text-slate-400" />
+        <p className="text-sm font-medium text-slate-700">
+          Drop a document here or click to upload
+        </p>
+        <p className="text-xs text-slate-400">PNG, JPG or PDF</p>
       </div>
       <input
         ref={inputRef}
@@ -173,32 +176,38 @@ function OcrResultCard({ onConfirm }: { onConfirm: () => void }) {
   }
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium">I read these details from your document. Check and correct them.</p>
+    <div className="space-y-3 rounded-2xl overflow-hidden border-0 border-t-4 border-t-blue-800 bg-white/95 backdrop-blur-sm shadow-xl ring-1 ring-slate-900/5 p-4">
+      <p className="text-sm font-medium text-slate-700">
+        I read these details from your document. Check and correct them.
+      </p>
       {(Object.keys(fields) as Array<keyof OcrFields>).map((key) => {
         const confidence = MOCK_CONFIDENCES[key];
         const low = confidence < LOW_CONFIDENCE;
         return (
           <div key={key} className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase text-muted-foreground">
+              <span className="text-xs font-semibold uppercase text-slate-500">
                 {key === "name" ? "Full name" : key === "dob" ? "Date of birth" : "ID number"}
               </span>
-              <Badge variant={low ? "warning" : "secondary"}>
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                  low ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
+                }`}
+              >
                 {low ? <TriangleAlert className="h-3 w-3" /> : null}
                 {Math.round(confidence * 100)}%
-              </Badge>
+              </span>
             </div>
             <Input
               value={fields[key]}
               inputMode={key === "idNumber" ? "numeric" : "text"}
               onChange={(event) => updateField(key, event.target.value)}
-              className={low ? "border-orange-400" : undefined}
+              className={low ? "border-amber-400" : undefined}
             />
           </div>
         );
       })}
-      <Button type="button" className="w-full" onClick={onConfirm}>
+      <Button type="button" className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 text-white shadow-md rounded-xl font-semibold" onClick={onConfirm}>
         Confirm
       </Button>
     </div>
@@ -212,30 +221,53 @@ function DigiLockerCard({
   onMatch: () => void;
   onMismatch: () => void;
 }) {
-  const [otp, setOtp] = useState("");
-  const ready = /^\d{6}$/.test(otp);
+  const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(""));
+  const inputs = useRef<Array<HTMLInputElement | null>>([]);
+  const ready = digits.every((digit) => digit !== "");
+
+  function setDigit(index: number, value: string) {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    setDigits((current) => current.map((d, i) => (i === index ? digit : d)));
+    if (digit && index < OTP_LENGTH - 1) {
+      inputs.current[index + 1]?.focus();
+    }
+  }
+
+  function handleKeyDown(index: number, event: ReactKeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Backspace" && digits[index] === "" && index > 0) {
+      inputs.current[index - 1]?.focus();
+    }
+  }
 
   return (
-    <div className="space-y-3">
+    <div className="rounded-2xl overflow-hidden border-0 border-t-4 border-t-blue-800 bg-white/95 backdrop-blur-sm shadow-xl ring-1 ring-slate-900/5 p-4 space-y-3">
       <div className="flex items-center gap-2">
-        <ShieldCheck className="h-5 w-5 text-[var(--civic-ink)]" />
-        <p className="text-sm font-medium">DigiLocker verification</p>
+        <ShieldCheck className="h-5 w-5 text-indigo-600" />
+        <p className="text-sm font-medium text-slate-800">DigiLocker verification</p>
       </div>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-slate-500">
         Enter the 6-digit OTP shown in your DigiLocker app.
       </p>
-      <Input
-        value={otp}
-        inputMode="numeric"
-        maxLength={6}
-        placeholder="••••••"
-        className="text-center text-lg tracking-[0.5em]"
-        onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
-      />
+      <div className="flex justify-center gap-2">
+        {digits.map((digit, index) => (
+          <Input
+            key={index}
+            ref={(el) => {
+              inputs.current[index] = el;
+            }}
+            value={digit}
+            inputMode="numeric"
+            maxLength={1}
+            onChange={(event) => setDigit(index, event.target.value)}
+            onKeyDown={(event) => handleKeyDown(index, event)}
+            className="w-12 h-14 text-center text-2xl font-bold bg-slate-50 border-2 border-slate-200 text-blue-950 rounded-xl focus:border-blue-700 focus:ring-4 focus:ring-blue-700/20"
+          />
+        ))}
+      </div>
       <div className="flex gap-2">
         <Button
           type="button"
-          className="flex-1"
+          className="flex-1 bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 text-white shadow-md rounded-xl font-semibold"
           disabled={!ready}
           onClick={onMatch}
         >
@@ -244,7 +276,7 @@ function DigiLockerCard({
         <Button
           type="button"
           variant="outline"
-          className="flex-1"
+          className="flex-1 rounded-xl font-semibold"
           disabled={!ready}
           onClick={onMismatch}
         >
@@ -257,7 +289,7 @@ function DigiLockerCard({
 
 function ReceiptCard({ urn }: { urn: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border-2 border-green-600 bg-green-50 p-4">
+    <div className="flex items-start gap-3 rounded-2xl overflow-hidden border-0 border-t-4 border-t-emerald-500 bg-white/95 backdrop-blur-sm shadow-xl ring-1 ring-slate-900/5 p-4">
       <CircleCheck className="mt-0.5 h-6 w-6 shrink-0 text-green-700" />
       <div>
         <p className="font-semibold text-green-900">Request submitted</p>
@@ -288,10 +320,7 @@ export const ChatInterface = forwardRef<ChatHandle>(function ChatInterface(
   }, []);
 
   const appendBot = useCallback((content: BotContent) => {
-    setMessages((current) => [
-      ...current,
-      { id: id(), role: "bot", content },
-    ]);
+    setMessages((current) => [...current, { id: id(), role: "bot", content }]);
   }, []);
 
   useImperativeHandle(
@@ -364,13 +393,13 @@ export const ChatInterface = forwardRef<ChatHandle>(function ChatInterface(
   }
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col bg-[var(--civic-field)]">
+    <div className="flex min-w-0 flex-1 flex-col bg-slate-50/60">
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.map((message) => {
           if (message.role === "user") {
             return (
               <div key={message.id} className="flex justify-end">
-                <div className="max-w-[75%] rounded-2xl bg-[var(--civic-ink)] px-4 py-2 text-sm text-white">
+                <div className="max-w-[75%] rounded-2xl rounded-tr-sm bg-gradient-to-r from-blue-700 to-blue-900 px-4 py-2 text-sm text-white shadow-md">
                   {message.text}
                 </div>
               </div>
@@ -379,7 +408,7 @@ export const ChatInterface = forwardRef<ChatHandle>(function ChatInterface(
 
           return (
             <div key={message.id} className="flex justify-start">
-              <div className="max-w-[85%] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm">
+              <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">
                 {message.content.type === "text" ? <p>{message.content.text}</p> : null}
                 {message.content.type === "uploadPrompt" ? (
                   <UploadPrompt onFile={handleFile} />
@@ -412,8 +441,8 @@ export const ChatInterface = forwardRef<ChatHandle>(function ChatInterface(
         <p className="px-4 pb-1 text-xs text-destructive">{error}</p>
       ) : null}
 
-      <div className="sticky bottom-0 border-t bg-[var(--civic-paper)] p-3">
-        <div className="flex items-center gap-2">
+      <div className="sticky bottom-0 z-10 bg-slate-50/60 pb-2 pt-2">
+        <div className="mx-4 mb-4 flex items-center gap-1 rounded-full border border-slate-200 bg-white p-2 shadow-lg">
           <Button
             type="button"
             variant="ghost"
@@ -439,14 +468,15 @@ export const ChatInterface = forwardRef<ChatHandle>(function ChatInterface(
               }
             }}
             placeholder="Ask about a government service…"
-            className="flex-1"
+            className="flex-1 rounded-full border-0 shadow-none focus-visible:ring-0"
           />
           <Button
             type="button"
-            variant={listening ? "default" : "ghost"}
+            variant="ghost"
             size="icon"
             aria-label="Voice input"
             onClick={toggleMic}
+            className={listening ? "animate-pulse bg-red-100 text-red-600" : ""}
           >
             <Mic className="h-5 w-5" />
           </Button>
@@ -456,6 +486,7 @@ export const ChatInterface = forwardRef<ChatHandle>(function ChatInterface(
             aria-label="Send"
             disabled={input.trim().length === 0}
             onClick={handleSend}
+            className="rounded-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 text-white shadow-md"
           >
             <Send className="h-5 w-5" />
           </Button>
