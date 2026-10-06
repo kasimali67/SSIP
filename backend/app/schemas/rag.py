@@ -1,10 +1,21 @@
-from pydantic import BaseModel, Field
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.services.i18n import Language
 
 
-class RAGQueryRequest(BaseModel):
-    question: str = Field(min_length=1, max_length=2000)
+class RagQueryRequest(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    question: str = Field(min_length=2, max_length=1000)
+    language: Language = Language.EN
 
 
-class RAGQueryResponse(BaseModel):
+class RagQueryResponse(BaseModel):
     answer: str
     sources: list[str]
+    language: Language
+    translation_status: Literal["success", "skipped", "failed"]

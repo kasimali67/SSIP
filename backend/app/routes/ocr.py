@@ -4,12 +4,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile, status
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.concurrency import run_in_threadpool
 
 from app.config import get_settings
 from app.db import get_session
 from app.models.audit_log import AuditLog
 from app.schemas.ocr import OcrExtractResponse
+from app.services.ocr import OcrUnavailable
 from app.services.ocr_engine import extract_fields
 
 router = APIRouter(prefix="/api/ocr", tags=["ocr"])
@@ -72,16 +72,16 @@ async def extract_ocr(
     await file.close()
 
     try:
-        result = await run_in_threadpool(extract_fields, image_bytes)
+        result = await extract_fields(image_bytes)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid image payload",
         ) from exc
-    except RuntimeError as exc:
+    except OcrUnavailable as exc:
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="OCR provider unavailable",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="We could not read this photo. Retake it in good light.",
         ) from exc
 
     session.add(

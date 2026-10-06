@@ -1,25 +1,15 @@
-from functools import lru_cache
+"""Compatibility module.
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+Settings now live in ``app.core.config``. This module re-exports them so that
+existing imports of ``app.config`` keep working. New code should import from
+``app.core.config`` directly.
+"""
+from app.core.config import (
+    AppEnv,
+    AuthMode,
+    DigiLockerMode,
+    Settings,
+    get_settings,
+)
 
-
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
-    )
-
-    app_env: str = "development"
-
-    supabase_url: str | None = None
-    supabase_key: str | None = None
-    supabase_jwt_secret: str | None = None
-    database_url: str | None = None
-    openrouter_api_key: str | None = None
-    gemini_api_key: str | None = None
-
-
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
+__all__ = ["AppEnv", "AuthMode", "DigiLockerMode", "Settings", "get_settings"]

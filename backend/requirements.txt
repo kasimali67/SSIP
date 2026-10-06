@@ -15,4 +15,9 @@ pytest
 llama-index-core
 llama-index-embeddings-fastembed
 fastembed
+pyjwt[crypto]
+rapidfuzz
+httpx
+pytesseract
+defusedxml
 python-multipart==0.0.32
