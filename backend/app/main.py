@@ -8,6 +8,7 @@ from app.config import get_settings
 from app.routes.ocr import router as ocr_router
 from app.routes.rag import router as rag_router
 from app.routes.verification import router as verification_router
+from app.routes.submission import router as submission_router
 
 settings = get_settings()
 
@@ -24,6 +25,7 @@ app.add_middleware(
 app.include_router(ocr_router)
 app.include_router(rag_router)
 app.include_router(verification_router)
+app.include_router(submission_router)
 
 
 @app.exception_handler(HTTPException)
