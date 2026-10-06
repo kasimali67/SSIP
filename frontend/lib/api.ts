@@ -14,6 +14,7 @@ export interface OcrExtractResponse {
 
 export interface RagQueryRequest {
   question: string;
+  language?: string;
 }
 
 export interface RagQueryResponse {
@@ -94,8 +95,14 @@ export async function extractOcr(file: File): Promise<OcrExtractResponse> {
   });
 }
 
-export async function queryRag(question: string): Promise<RagQueryResponse> {
+export async function queryRag(
+  question: string,
+  language?: string,
+): Promise<RagQueryResponse> {
   const body: RagQueryRequest = { question };
+  if (language) {
+    body.language = language;
+  }
 
   return request<RagQueryResponse>("/api/rag/query", {
     method: "POST",

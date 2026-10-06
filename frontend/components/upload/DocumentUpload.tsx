@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
-import { Camera, Loader2, TriangleAlert, UploadCloud } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Camera, Loader2, UploadCloud } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { ConfidenceField } from "@/components/civic/ConfidenceField";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,11 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { extractOcr } from "@/lib/api";
-
-const LOW_CONFIDENCE_THRESHOLD = 0.75;
+import { savePendingFields, toLast4 } from "@/lib/verificationStore";
 
 interface VerificationFields {
   name: string;
@@ -26,57 +24,8 @@ interface VerificationFields {
 
 type FieldKey = keyof VerificationFields;
 
-interface VerificationFieldProps {
-  id: string;
-  label: string;
-  value: string;
-  confidence: number;
-  onChange: (value: string) => void;
-}
-
-function formatConfidence(confidence: number): string {
-  return `${Math.round(confidence * 100)}%`;
-}
-
-function VerificationField({
-  id,
-  label,
-  value,
-  confidence,
-  onChange,
-}: VerificationFieldProps) {
-  const isLowConfidence = confidence < LOW_CONFIDENCE_THRESHOLD;
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label htmlFor={id}>{label}</Label>
-        <Badge variant={isLowConfidence ? "warning" : "secondary"}>
-          {isLowConfidence ? <TriangleAlert className="h-3 w-3" /> : null}
-          {formatConfidence(confidence)}
-        </Badge>
-      </div>
-      <Input
-        id={id}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className={
-          isLowConfidence
-            ? "border-orange-400 focus-visible:ring-orange-400"
-            : undefined
-        }
-      />
-      {isLowConfidence ? (
-        <p className="flex items-center gap-1 text-xs text-orange-600">
-          <TriangleAlert className="h-3 w-3" />
-          Low confidence — please verify this value.
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
 export function DocumentUpload() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [fields, setFields] = useState<VerificationFields | null>(null);
@@ -85,7 +34,6 @@ export function DocumentUpload() {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -94,7 +42,6 @@ export function DocumentUpload() {
     setFile(nextFile);
     setFields(null);
     setConfidences(null);
-    setSaved(false);
     setError(null);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
@@ -153,15 +100,18 @@ export function DocumentUpload() {
   }
 
   function handleConfirm() {
-    if (!fields) {
+    if (!fields || !confidences) {
       return;
     }
-    console.log("Confirmed extraction", {
-      name: fields.name,
-      dob: fields.dob,
-      idNumber: fields.idNumber,
+    savePendingFields({
+      name: { value: fields.name, confidence: confidences.name },
+      dob: { value: fields.dob, confidence: confidences.dob },
+      id_last4: {
+        value: toLast4(fields.idNumber),
+        confidence: confidences.idNumber,
+      },
     });
-    setSaved(true);
+    router.push("/verify");
   }
 
   return (
@@ -243,37 +193,31 @@ export function DocumentUpload() {
         {fields && confidences ? (
           <div className="space-y-4">
             <h2 className="text-sm font-semibold">Verify extracted fields</h2>
-            <VerificationField
+            <ConfidenceField
               id="name"
-              label="Name"
+              labelKey="fields.name"
               value={fields.name}
               confidence={confidences.name}
               onChange={(value) => updateField("name", value)}
             />
-            <VerificationField
+            <ConfidenceField
               id="dob"
-              label="Date of Birth"
+              labelKey="fields.dob"
               value={fields.dob}
               confidence={confidences.dob}
               onChange={(value) => updateField("dob", value)}
             />
-            <VerificationField
+            <ConfidenceField
               id="idNumber"
-              label="ID Number"
+              labelKey="fields.idLast4"
               value={fields.idNumber}
               confidence={confidences.idNumber}
+              inputMode="numeric"
               onChange={(value) => updateField("idNumber", value)}
             />
-            <div className="flex items-center gap-3">
-              <Button type="button" onClick={handleConfirm}>
-                Confirm &amp; Save
-              </Button>
-              {saved ? (
-                <span className="text-sm text-muted-foreground">
-                  Saved to console.
-                </span>
-              ) : null}
-            </div>
+            <Button type="button" onClick={handleConfirm}>
+              Confirm &amp; Save
+            </Button>
           </div>
         ) : null}
       </CardContent>

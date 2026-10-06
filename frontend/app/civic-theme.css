@@ -1,0 +1,55 @@
+/*
+ * Civic theme. Import once in app/layout.tsx after globals.css.
+ * Palette (all text pairs meet WCAG AA, most meet AAA):
+ *   ink      #12305F  primary actions, active step, headings
+ *   paper    #FFFFFF  cards and inputs
+ *   field    #F2F5F9  page background
+ *   verified #166534  review #C2410C  mismatch #B91C1C
+ */
+:root {
+  --civic-ink: #12305f;
+  --civic-ink-hover: #0c2348;
+  --civic-paper: #ffffff;
+  --civic-field: #f2f5f9;
+  --civic-text: #1b2430;
+  --civic-text-muted: #3d4a5c;
+  --civic-verified: #166534;
+  --civic-review: #c2410c;
+  --civic-mismatch: #b91c1c;
+  --civic-focus: #1d4ed8;
+}
+
+html {
+  font-size: 112.5%; /* 18px base: easier reading on low-end phones */
+}
+
+body {
+  background: var(--civic-field);
+  color: var(--civic-text);
+  font-family: var(--font-devanagari), system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+html:lang(gu) body {
+  font-family: var(--font-gujarati), var(--font-devanagari), system-ui, sans-serif;
+}
+
+/* Indic scripts need extra room above and below the line for matras. */
+html:lang(hi) body,
+html:lang(gu) body {
+  line-height: 1.75;
+}
+
+:focus-visible {
+  outline: 3px solid var(--civic-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

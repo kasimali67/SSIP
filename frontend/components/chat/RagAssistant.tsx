@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { queryRag } from "@/lib/api";
+import { useLanguage } from "@/lib/LanguageContext";
 
 interface ChatMessage {
   id: string;
@@ -16,6 +17,7 @@ interface ChatMessage {
 }
 
 export function RagAssistant() {
+  const { lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState("");
@@ -38,7 +40,7 @@ export function RagAssistant() {
     setLoading(true);
 
     try {
-      const response = await queryRag(trimmed);
+      const response = await queryRag(trimmed, lang);
       setMessages((current) => [
         ...current,
         {
