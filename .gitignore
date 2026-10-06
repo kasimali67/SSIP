@@ -28,3 +28,9 @@ Thumbs.db
 .kilocode/
 .pytest_cache/
 *.tsbuildinfo
+
+# Local update packs & scratch files
+claude_update/
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+*.scratch.md
