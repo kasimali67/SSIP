@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UIDAI – myAadhaar Self-Service Update Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            saffron: '#FF9933',
+            'india-green': '#138808',
+            navy: '#1A3A6E',
+            'navy-dark': '#0F2347',
+          },
+          fontFamily: {
+            sans: ['Arial', 'Helvetica', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .tricolor-stripe {
+        background: linear-gradient(to right,
+          #FF9933 0%,   #FF9933 33.33%,
+          #ffffff 33.33%, #ffffff 66.67%,
+          #138808 66.67%, #138808 100%
+        );
+      }
+      .captcha-hatched {
+        background-image: repeating-linear-gradient(
+          45deg,
+          #e2e8f0 0px, #e2e8f0 4px,
+          #f1f5f9 4px, #f1f5f9 12px
+        );
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-100 font-sans antialiased">
+
+  <!-- ① Tricolor accent stripe -->
+  <div class="tricolor-stripe h-2 w-full"></div>
+
+  <!-- ② Government civic header bar -->
+  <header class="bg-white border-b border-slate-200 shadow-sm">
+    <div class="mx-auto flex max-w-5xl items-center gap-5 px-4 py-4">
+
+      <!-- Emblem placeholder -->
+      <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-navy bg-navy text-white font-black text-2xl select-none">
+        आ
+      </div>
+
+      <!-- Brand text -->
+      <div class="flex-1">
+        <p class="text-xs font-semibold uppercase tracking-widest text-slate-500">
+          Government of India &nbsp;·&nbsp; Unique Identification Authority
+        </p>
+        <p class="mt-0.5 text-2xl font-black">
+          <span class="text-navy">my</span><span class="text-orange-500">Aadhaar</span>
+        </p>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Self-Service Update Portal &nbsp;|&nbsp; स्व-सेवा अद्यतन पोर्टल
+        </p>
+      </div>
+
+      <!-- Right badge -->
+      <div class="hidden sm:flex flex-col items-end">
+        <span class="rounded-full bg-india-green/10 px-3 py-1 text-xs font-bold text-india-green tracking-wide">
+          SSUP – Secure
+        </span>
+        <span class="mt-1 text-xs text-slate-400">Helpline: <strong>1947</strong></span>
+      </div>
+    </div>
+
+    <!-- Nav strip -->
+    <nav class="bg-navy">
+      <div class="mx-auto flex max-w-5xl gap-0 px-4 overflow-x-auto">
+        <a href="#" class="text-blue-200 hover:bg-navy-dark hover:text-white text-xs px-4 py-2.5 font-medium whitespace-nowrap transition-colors">Home</a>
+        <a href="#" class="bg-navy-dark text-white text-xs px-4 py-2.5 font-medium whitespace-nowrap border-b-2 border-orange-400">Update Demographics</a>
+        <a href="#" class="text-blue-200 hover:bg-navy-dark hover:text-white text-xs px-4 py-2.5 font-medium whitespace-nowrap transition-colors">Aadhaar Status</a>
+        <a href="#" class="text-blue-200 hover:bg-navy-dark hover:text-white text-xs px-4 py-2.5 font-medium whitespace-nowrap transition-colors">Download Aadhaar</a>
+        <a href="#" class="text-blue-200 hover:bg-navy-dark hover:text-white text-xs px-4 py-2.5 font-medium whitespace-nowrap transition-colors">Help &amp; Support</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ③ Breadcrumb -->
+  <div class="bg-slate-50 border-b border-slate-200 py-2">
+    <p class="mx-auto max-w-5xl px-4 text-xs text-slate-500">
+      <a href="#" class="hover:underline text-navy">Home</a>
+      <span class="mx-1">›</span>
+      <span class="font-medium text-slate-700">Update Demographic Data (SSUP)</span>
+    </p>
+  </div>
+
+  <!-- ④ Main content -->
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <div class="flex flex-col items-center">
+
+      <!-- Form card -->
+      <div class="w-full max-w-xl overflow-hidden rounded-2xl shadow-2xl ring-1 ring-slate-900/10">
+
+        <!-- Deep navy card banner -->
+        <div class="bg-blue-900 px-6 py-5 text-white">
+          <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <div>
+              <h1 class="text-base font-bold tracking-wide">Update Demographic Data (SSUP)</h1>
+              <p class="text-xs text-blue-300 mt-0.5">Self-Service Update Portal &nbsp;·&nbsp; Aadhaar Act, 2016</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info banner -->
+        <div class="bg-amber-50 border-l-4 border-amber-400 px-5 py-3 text-xs text-amber-800">
+          <strong>Note:</strong> Fields marked <span class="text-red-600 font-bold">*</span> are mandatory. Ensure all details exactly match your existing Aadhaar record.
+        </div>
+
+        <!-- Form body -->
+        <div class="bg-white px-6 py-6 space-y-5">
+          <form id="ssupForm" novalidate>
+
+            <!-- Section: Personal Details -->
+            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-800 mb-3">
+              ● Personal Details
+            </p>
+
+            <!-- Full Name -->
+            <div class="space-y-1.5">
+              <label for="fullName" class="block text-sm font-semibold text-slate-700">
+                Full Name <span class="text-red-600">*</span>
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                name="full_name"
+                placeholder="As it appears on your current Aadhaar"
+                autocomplete="off"
+                class="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-700/20 transition"
+              />
+              <p class="text-xs text-slate-400">Enter name in English only.</p>
+            </div>
+
+            <!-- Date of Birth -->
+            <div class="space-y-1.5">
+              <label for="dob" class="block text-sm font-semibold text-slate-700">
+                Date of Birth <span class="text-red-600">*</span>
+              </label>
+              <input
+                type="text"
+                id="dob"
+                name="date_of_birth"
+                placeholder="DD/MM/YYYY"
+                maxlength="10"
+                autocomplete="off"
+                class="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-700/20 transition"
+              />
+            </div>
+
+            <!-- Address -->
+            <div class="space-y-1.5">
+              <label for="address" class="block text-sm font-semibold text-slate-700">
+                Residential Address <span class="text-red-600">*</span>
+              </label>
+              <textarea
+                id="address"
+                name="address"
+                rows="3"
+                placeholder="House/Flat No., Street, Village/Town, District, State – PIN"
+                autocomplete="off"
+                class="w-full resize-none rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-700/20 transition"
+              ></textarea>
+            </div>
+
+            <!-- Divider -->
+            <hr class="border-dashed border-slate-200" />
+
+            <!-- Section: Security Verification -->
+            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-800 mb-3">
+              ● Security Verification
+            </p>
+
+            <!-- SVG Captcha -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700">
+                Enter Captcha <span class="text-red-600">*</span>
+              </label>
+
+              <div class="flex items-center gap-3">
+                <!-- Stylised SVG captcha box -->
+                <div class="captcha-hatched rounded-lg border border-slate-300 overflow-hidden select-none" style="width:160px;height:56px;">
+                  <svg id="captchaSvg" width="160" height="56" viewBox="0 0 160 56" xmlns="http://www.w3.org/2000/svg">
+                    <!-- distortion lines -->
+                    <line x1="0"   y1="28" x2="160" y2="18" stroke="#94a3b8" stroke-width="1.2"/>
+                    <line x1="0"   y1="38" x2="160" y2="30" stroke="#cbd5e1" stroke-width="0.8"/>
+                    <line x1="0"   y1="14" x2="160" y2="44" stroke="#94a3b8" stroke-width="1"/>
+                    <text id="captchaText"
+                      x="80" y="38"
+                      text-anchor="middle"
+                      font-family="'Courier New', monospace"
+                      font-size="26"
+                      font-weight="900"
+                      letter-spacing="6"
+                      fill="#1A3A6E"
+                      transform="skewX(-6)"
+                    >K9mR2X</text>
+                  </svg>
+                </div>
+
+                <!-- Captcha input -->
+                <input
+                  type="text"
+                  id="captchaInput"
+                  name="captcha"
+                  maxlength="8"
+                  placeholder="Type here"
+                  autocomplete="off"
+                  class="flex-1 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm font-mono text-slate-900 placeholder-slate-400 focus:border-blue-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-700/20 transition"
+                />
+
+                <!-- Refresh button -->
+                <button
+                  type="button"
+                  onclick="refreshCaptcha()"
+                  title="Refresh Captcha"
+                  class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:border-blue-700 hover:text-blue-700 transition"
+                  aria-label="Refresh Captcha"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+              </div>
+              <p class="text-xs text-slate-400">Characters are case-sensitive. Click ↺ to refresh.</p>
+            </div>
+
+            <!-- Submit button -->
+            <button
+              type="submit"
+              class="mt-2 w-full rounded-xl bg-gradient-to-r from-blue-800 to-navy py-3 text-sm font-bold tracking-wide text-white shadow-lg hover:from-blue-900 hover:to-navy-dark active:scale-[0.99] transition-all"
+            >
+              Submit Update Request
+            </button>
+
+            <!-- Fine print -->
+            <p class="text-center text-xs text-slate-400 leading-relaxed">
+              By submitting you agree to the
+              <a href="#" class="text-blue-700 hover:underline">Terms &amp; Conditions</a>.
+              Your data is protected under the <strong>Aadhaar (Targeted Delivery of Financial and Other Subsidies, Benefits and Services) Act, 2016</strong>.
+            </p>
+
+          </form>
+        </div><!-- /form body -->
+      </div><!-- /card -->
+
+      <!-- Info pills -->
+      <div class="mt-6 flex flex-wrap justify-center gap-3 text-xs text-slate-500">
+        <span class="flex items-center gap-1 rounded-full bg-white px-3 py-1.5 shadow-sm ring-1 ring-slate-200">
+          <svg class="h-3.5 w-3.5 text-india-green" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          256-bit SSL Encrypted
+        </span>
+        <span class="flex items-center gap-1 rounded-full bg-white px-3 py-1.5 shadow-sm ring-1 ring-slate-200">
+          <svg class="h-3.5 w-3.5 text-navy" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+          Aadhaar Act, 2016
+        </span>
+        <span class="flex items-center gap-1 rounded-full bg-white px-3 py-1.5 shadow-sm ring-1 ring-slate-200">
+          📞 Helpline: <strong>1947</strong>
+        </span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-10 bg-navy-dark py-6 text-center text-xs text-blue-300">
+    <p>© 2024 Unique Identification Authority of India (UIDAI) · Government of India</p>
+    <div class="mt-2 flex justify-center gap-4">
+      <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+      <span class="text-blue-600">|</span>
+      <a href="#" class="hover:text-white transition-colors">Accessibility</a>
+      <span class="text-blue-600">|</span>
+      <a href="#" class="hover:text-white transition-colors">Terms of Use</a>
+      <span class="text-blue-600">|</span>
+      <a href="#" class="hover:text-white transition-colors">Contact Us</a>
+    </div>
+  </footer>
+
+  <script>
+    // ── Captcha pool ──────────────────────────────────────────────────────────
+    const pool = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+
+    function generateCaptcha(len = 6) {
+      return Array.from({ length: len }, () =>
+        pool[Math.floor(Math.random() * pool.length)]
+      ).join('');
+    }
+
+    function refreshCaptcha() {
+      const code = generateCaptcha();
+      const textEl = document.getElementById('captchaText');
+      if (textEl) textEl.textContent = code;
+      const inputEl = document.getElementById('captchaInput');
+      if (inputEl) { inputEl.value = ''; inputEl.focus(); }
+    }
+
+    // ── DOB auto-format DD/MM/YYYY ────────────────────────────────────────────
+    document.getElementById('dob')?.addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length >= 5) v = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4);
+      else if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
+      this.value = v;
+    });
+
+    // ── Form submit ───────────────────────────────────────────────────────────
+    document.getElementById('ssupForm')?.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const expected = document.getElementById('captchaText')?.textContent?.trim() ?? '';
+      const entered  = document.getElementById('captchaInput')?.value?.trim() ?? '';
+
+      if (entered !== expected) {
+        alert('Incorrect captcha. Please try again.');
+        refreshCaptcha();
+        return;
+      }
+      alert('✓ Your demographic update request has been submitted.\nYou will receive an OTP on your registered mobile for confirmation.');
+    });
+  </script>
+
+</body>
+</html>
